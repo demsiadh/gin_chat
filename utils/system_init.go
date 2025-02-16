@@ -6,6 +6,10 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"log"
+	"os"
+	"time"
 )
 
 var (
@@ -29,7 +33,19 @@ func InitConfig() {
 
 // InitDB 初始化数据库
 func InitDB() {
+	// 创建日志记录器
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second, // 慢查询阈值
+			LogLevel:      logger.Info, // 级别
+			Colorful:      true,        // 彩色
+		},
+	)
+	// 获取数据库配置
 	dnC := config.GetDBConfig()
-	DB, _ = gorm.Open(mysql.Open(dnC.String()), &gorm.Config{})
+	// 使用GORM打开MySQL数据库连接，并应用自定义的日志配置
+	DB, _ = gorm.Open(mysql.Open(dnC.String()), &gorm.Config{Logger: newLogger})
+	// 打印数据库初始化信息
 	fmt.Println("MySQl init ...")
 }
