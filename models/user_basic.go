@@ -1,6 +1,7 @@
 package models
 
 import (
+	"ginchat/utils"
 	"gorm.io/gorm"
 	"time"
 )
@@ -23,4 +24,11 @@ type UserBasic struct {
 
 func (table *UserBasic) TableName() string {
 	return "user_basic"
+}
+
+// GetUserBasicList 获取用户列表
+func GetUserBasicList() []*UserBasic {
+	data := make([]*UserBasic, 10)
+	utils.DB.Find(&data)
+	return data
 }

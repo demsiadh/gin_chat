@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// GetIndex 索引页面
 func GetIndex(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"msg": "hello, world",

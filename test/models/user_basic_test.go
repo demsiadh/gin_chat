@@ -11,7 +11,7 @@ import (
 )
 
 func TestUserBasic(t *testing.T) {
-	dbConfig := config.NewDBConnection("gin_chat", "gin_chat", "192.168.88.130", 3306, "gin_chat", "utf8mb4")
+	dbConfig := config.GetDBConfig()
 	db, err := gorm.Open(mysql.Open(dbConfig.String()), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
@@ -31,7 +31,8 @@ func TestUserBasic(t *testing.T) {
 	db.Create(user)
 
 	// Read
-	fmt.Println(db.First(user, 1)) // 根据整型主键查找
+	db.First(user, 1)
+	fmt.Println(user) // 根据整型主键查找
 
 	db.Model(user).Update("Name", "张三")
 }

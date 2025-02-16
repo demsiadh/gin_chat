@@ -1,0 +1,8 @@
+database:
+  username: gin_chat
+  password: gin_chat
+  host: 192.168.88.130
+  port: 3306
+  dbname: gin_chat
+  charset: utf8mb4
+  parseTime: true

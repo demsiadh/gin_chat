@@ -1,29 +1,28 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/spf13/viper"
+)
 
 // DBConnection 数据库连接信息
 type DBConnection struct {
-	userName     string
-	password     string
-	host         string
-	port         int
-	databaseName string
-	charset      string
+	UserName     string `mapstructure:"username"`
+	Password     string `mapstructure:"password"`
+	Host         string `mapstructure:"host"`
+	Port         int    `mapstructure:"port"`
+	DatabaseName string `mapstructure:"dbname"`
+	Charset      string `mapstructure:"charset"`
+	ParseTime    string `mapstructure:"parseTime"`
 }
 
 func (dbC *DBConnection) String() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s", dbC.userName, dbC.password, dbC.host, dbC.port, dbC.databaseName, dbC.charset)
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=%s", dbC.UserName, dbC.Password, dbC.Host, dbC.Port, dbC.DatabaseName, dbC.Charset, dbC.ParseTime)
 }
 
-// NewDBConnection 创建数据库配置信息
-func NewDBConnection(userName, password, host string, port int, databaseName, charset string) *DBConnection {
-	return &DBConnection{
-		userName:     userName,
-		password:     password,
-		host:         host,
-		port:         port,
-		databaseName: databaseName,
-		charset:      charset,
+// GetDBConfig 获取数据库连接信息
+func GetDBConfig() (dbConfig *DBConnection) {
+	if err := viper.UnmarshalKey("database", &dbConfig); err != nil {
 	}
+	return
 }
