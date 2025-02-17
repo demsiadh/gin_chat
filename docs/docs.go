@@ -106,6 +106,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/loginUser": {
+            "post": {
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "登录用户",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "password",
+                        "name": "password",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "code\", \"message\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/updateUser": {
             "post": {
                 "tags": [

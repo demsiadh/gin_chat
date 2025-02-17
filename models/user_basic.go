@@ -15,6 +15,7 @@ type UserBasic struct {
 	Identity      string
 	ClientIp      string
 	ClientPort    string
+	Salt          string
 	LoginTime     *time.Time
 	HeartbeatTime *time.Time
 	LogoutTime    *time.Time `gorm:"column:logout_time" json:"logout_time"`
@@ -51,4 +52,25 @@ func UpdateUser(user UserBasic) *gorm.DB {
 		Phone:    user.Phone,
 		Email:    user.Email,
 	})
+}
+
+// FindUserByName 根据名字查询用户
+func FindUserByName(name string) UserBasic {
+	user := UserBasic{}
+	utils.DB.Where("name = ?", name).First(&user)
+	return user
+}
+
+// FindUserByPhone 根据手机号查询用户
+func FindUserByPhone(phone string) UserBasic {
+	user := UserBasic{}
+	utils.DB.Where("phone = ?", phone).First(&user)
+	return user
+}
+
+// FindUserByEmail 根据邮箱查询用户
+func FindUserByEmail(email string) UserBasic {
+	user := UserBasic{}
+	utils.DB.Where("email = ?", email).First(&user)
+	return user
 }

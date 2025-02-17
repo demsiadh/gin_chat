@@ -1,9 +1,12 @@
 package service
 
 import (
+	"fmt"
 	"ginchat/models"
+	"ginchat/utils"
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
+	"math/rand"
 	"net/http"
 	"strconv"
 )
@@ -34,13 +37,25 @@ func CreateUser(context *gin.Context) {
 	user.Name = context.Query("name")
 	password := context.Query("password")
 	rePassword := context.Query("rePassword")
+	// 判断两次密码是否一致
 	if password != rePassword {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"message": "两次密码不一致!",
 		})
 		return
 	}
-	user.PassWord = password
+
+	// 判断用户名是否被注册
+	if data := models.FindUserByName(user.Name); data.Name != "" {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message": "用户名已存在!",
+		})
+		return
+	}
+
+	// 加密密码
+	user.Salt = fmt.Sprintf("%06d", rand.Int31()%1000000)
+	user.PassWord = utils.MakePassword(password, user.Salt)
 	models.CreateUser(user)
 	context.JSON(http.StatusOK, gin.H{
 		"message": "创建成功!",
@@ -93,5 +108,37 @@ func UpdateUser(context *gin.Context) {
 	models.UpdateUser(user)
 	context.JSON(http.StatusOK, gin.H{
 		"message": "修改用户成功!",
+	})
+}
+
+// LoginUser 登录用户
+// @Summary 登录用户
+// @Tags 用户模块
+// @param name formData string false "name"
+// @param password formData string false "password"
+// @Success 200 {string} json{"code", "message"}
+// @Router /user/loginUser [post]
+func LoginUser(context *gin.Context) {
+	name := context.PostForm("name")
+	password := context.PostForm("password")
+
+	// 查询用户记录
+	user := models.FindUserByName(name)
+	if user.ID == 0 {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message": "用户不存在!",
+		})
+		return
+	}
+
+	if !utils.ValidPassword(password, user.Salt, user.PassWord) {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message": "密码错误!",
+		})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "登录成功!",
 	})
 }

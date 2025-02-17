@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"ginchat/config"
 	"ginchat/models"
+	"ginchat/utils"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"testing"
-	"time"
 )
 
 func TestUserBasic(t *testing.T) {
+	utils.InitConfig()
 	dbConfig := config.GetDBConfig()
 	db, err := gorm.Open(mysql.Open(dbConfig.String()), &gorm.Config{})
 	if err != nil {
@@ -22,11 +23,8 @@ func TestUserBasic(t *testing.T) {
 
 	// Create
 	user := &models.UserBasic{
-		Name:          "admin",
-		PassWord:      "admin",
-		LoginTime:     time.Now(),
-		LogoutTime:    time.Now(),
-		HeartbeatTime: time.Now(),
+		Name:     "admin",
+		PassWord: "admin",
 	}
 	db.Create(user)
 

@@ -18,5 +18,6 @@ func Router() *gin.Engine {
 	server.GET("/user/createUser", service.CreateUser)
 	server.GET("/user/deleteUser", service.DeleteUser)
 	server.POST("/user/updateUser", service.UpdateUser)
+	server.POST("/user/loginUser", service.LoginUser)
 	return server
 }
