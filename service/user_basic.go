@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"ginchat/common"
 	"ginchat/models"
 	"ginchat/utils"
 	"github.com/asaskevich/govalidator"
@@ -18,10 +19,7 @@ import (
 // @Router /user/getUserBasicList [get]
 func GetUserBasicList(context *gin.Context) {
 	userBasicList := models.GetUserBasicList()
-	context.JSON(200, gin.H{
-		"msg":  "success",
-		"data": userBasicList,
-	})
+	context.JSON(200, common.NewSuccessResponseWithData(userBasicList))
 }
 
 // CreateUser 创建用户
@@ -39,17 +37,13 @@ func CreateUser(context *gin.Context) {
 	rePassword := context.Query("rePassword")
 	// 判断两次密码是否一致
 	if password != rePassword {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"message": "两次密码不一致!",
-		})
+		context.JSON(http.StatusBadRequest, common.NewErrorResponse("两次密码不一致!"))
 		return
 	}
 
 	// 判断用户名是否被注册
 	if data := models.FindUserByName(user.Name); data.Name != "" {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"message": "用户名已存在!",
-		})
+		context.JSON(http.StatusBadRequest, common.NewErrorResponse("用户名已存在!"))
 		return
 	}
 
@@ -57,9 +51,7 @@ func CreateUser(context *gin.Context) {
 	user.Salt = fmt.Sprintf("%06d", rand.Int31()%1000000)
 	user.PassWord = utils.MakePassword(password, user.Salt)
 	models.CreateUser(user)
-	context.JSON(http.StatusOK, gin.H{
-		"message": "创建成功!",
-	})
+	context.JSON(http.StatusOK, common.NewSuccessResponseWithData(user))
 }
 
 // DeleteUser 删除用户(逻辑删除)
@@ -73,9 +65,7 @@ func DeleteUser(context *gin.Context) {
 	id, _ := strconv.Atoi(context.Query("id"))
 	user.ID = uint(id)
 	models.DeleteUser(user)
-	context.JSON(http.StatusOK, gin.H{
-		"message": "删除成功!",
-	})
+	context.JSON(http.StatusOK, common.NewSuccessResponseWithData(user))
 }
 
 // UpdateUser 修改用户
@@ -99,16 +89,12 @@ func UpdateUser(context *gin.Context) {
 
 	_, err := govalidator.ValidateStruct(user)
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"message": "修改用户失败!(传入参数不规范)",
-		})
+		context.JSON(http.StatusBadRequest, common.NewErrorResponse("修改用户失败!(传入参数不规范)"))
 		return
 	}
 
 	models.UpdateUser(user)
-	context.JSON(http.StatusOK, gin.H{
-		"message": "修改用户成功!",
-	})
+	context.JSON(http.StatusOK, common.NewSuccessResponseWithData(user))
 }
 
 // LoginUser 登录用户
@@ -125,20 +111,20 @@ func LoginUser(context *gin.Context) {
 	// 查询用户记录
 	user := models.FindUserByName(name)
 	if user.ID == 0 {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"message": "用户不存在!",
-		})
+		context.JSON(http.StatusBadRequest, common.NewErrorResponse("用户不存在"))
 		return
 	}
 
+	// 校验用户密码
 	if !utils.ValidPassword(password, user.Salt, user.PassWord) {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"message": "密码错误!",
-		})
+		context.JSON(http.StatusBadRequest, common.NewErrorResponse("用户名或密码错误!"))
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{
-		"message": "登录成功!",
-	})
+	// 发放token
+	user.Identity = utils.MakeToken()
+	// 修改数据库唯一标识
+	models.UpdateUser(user)
+
+	context.JSON(http.StatusOK, common.NewSuccessResponseWithData(user))
 }

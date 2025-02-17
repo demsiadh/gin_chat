@@ -3,7 +3,9 @@ package utils
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"strings"
+	"time"
 )
 
 // MD5Encode 对输入的字符串进行MD5哈希编码。
@@ -57,4 +59,9 @@ func MakePassword(password, salt string) string {
 func ValidPassword(password, salt, encodedPassword string) bool {
 	// 比较给定的加密密码与使用盐值对原始密码进行MD5加密后的结果是否一致
 	return encodedPassword == MD5Encode(password+salt)
+}
+
+// MakeToken 生成一个随机的令牌字符串。
+func MakeToken() string {
+	return MD5Encode(fmt.Sprintf("%d", time.Now().Unix()))
 }

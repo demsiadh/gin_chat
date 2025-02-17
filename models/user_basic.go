@@ -51,6 +51,7 @@ func UpdateUser(user UserBasic) *gorm.DB {
 		PassWord: user.PassWord,
 		Phone:    user.Phone,
 		Email:    user.Email,
+		Identity: user.Identity,
 	})
 }
 
