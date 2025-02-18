@@ -8,6 +8,7 @@ import (
 func main() {
 	utils.InitConfig()
 	utils.InitDB()
+	utils.InitRedis()
 	server := router.Router()
 	// 服务器端口
 	err := server.Run(":8088")

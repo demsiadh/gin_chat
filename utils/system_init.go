@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"ginchat/config"
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -13,7 +14,8 @@ import (
 )
 
 var (
-	DB *gorm.DB
+	DB    *gorm.DB
+	CACHE *redis.Client
 )
 
 // InitConfig 初始化项目配置
@@ -48,4 +50,17 @@ func InitDB() {
 	DB, _ = gorm.Open(mysql.Open(dnC.String()), &gorm.Config{Logger: newLogger})
 	// 打印数据库初始化信息
 	fmt.Println("MySQl init ...")
+}
+
+func InitRedis() {
+	redisC := config.GetRedisConfig()
+	CACHE = redis.NewClient(&redis.Options{
+		Addr:         redisC.Addr,
+		Password:     redisC.Password,
+		DB:           redisC.DB,
+		PoolSize:     redisC.PoolSize,
+		MinIdleConns: redisC.MinIdleConn,
+	})
+	pong, _ := CACHE.Ping(CACHE.Context()).Result()
+	fmt.Println("redis init success: ", pong)
 }

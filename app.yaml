@@ -7,3 +7,10 @@ database:
   charset: utf8mb4
   parseTime: true
   loc: Local
+
+redis:
+  addr: 192.168.88.130:6379
+  password: 123321
+  db: 5
+  poolSize: 30
+  minIdleConn: 30
