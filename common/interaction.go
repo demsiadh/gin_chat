@@ -8,7 +8,7 @@ const (
 // Response 响应对象
 type Response struct {
 	Code    int         `json:"code"`
-	Message string      `json:"message"`
+	Message string      `json:"msg"`
 	Data    interface{} `json:"data,omitempty"`
 }
 
@@ -34,4 +34,8 @@ func NewErrorResponse(message string) *Response {
 // NewSuccessResponseWithMsg 创建一个成功的响应对象
 func NewSuccessResponseWithMsg(msg string) *Response {
 	return NewResponse(SUCCESS, msg, nil)
+}
+
+func NewSuccessResponse() *Response {
+	return NewResponse(SUCCESS, "success", nil)
 }

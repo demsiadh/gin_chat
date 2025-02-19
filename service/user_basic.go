@@ -32,18 +32,22 @@ func GetUserBasicList(context *gin.Context) {
 // @Router /user/createUser [get]
 func CreateUser(context *gin.Context) {
 	user := models.UserBasic{}
-	user.Name = context.Query("name")
-	password := context.Query("password")
-	rePassword := context.Query("rePassword")
+	user.Name = context.PostForm("name")
+	password := context.PostForm("password")
+	rePassword := context.PostForm("rePassword")
+	if user.Name == "" || password == "" || rePassword == "" {
+		context.JSON(http.StatusOK, common.NewErrorResponse("请输入完整!"))
+		return
+	}
 	// 判断两次密码是否一致
 	if password != rePassword {
-		context.JSON(http.StatusBadRequest, common.NewErrorResponse("两次密码不一致!"))
+		context.JSON(http.StatusOK, common.NewErrorResponse("两次密码不一致!"))
 		return
 	}
 
 	// 判断用户名是否被注册
 	if data := models.FindUserByName(user.Name); data.Name != "" {
-		context.JSON(http.StatusBadRequest, common.NewErrorResponse("用户名已存在!"))
+		context.JSON(http.StatusOK, common.NewErrorResponse("用户名已存在!"))
 		return
 	}
 
@@ -111,13 +115,13 @@ func LoginUser(context *gin.Context) {
 	// 查询用户记录
 	user := models.FindUserByName(name)
 	if user.ID == 0 {
-		context.JSON(http.StatusBadRequest, common.NewErrorResponse("用户不存在"))
+		context.JSON(http.StatusOK, common.NewErrorResponse("用户不存在"))
 		return
 	}
 
 	// 校验用户密码
 	if !utils.ValidPassword(password, user.Salt, user.PassWord) {
-		context.JSON(http.StatusBadRequest, common.NewErrorResponse("用户名或密码错误!"))
+		context.JSON(http.StatusOK, common.NewErrorResponse("用户名或密码错误!"))
 		return
 	}
 

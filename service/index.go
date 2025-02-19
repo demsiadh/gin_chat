@@ -1,6 +1,7 @@
 package service
 
 import (
+	"ginchat/common"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -10,7 +11,9 @@ import (
 // @Success 200 {string} hello, world
 // @Router /index [get]
 func GetIndex(context *gin.Context) {
-	context.JSON(http.StatusOK, gin.H{
-		"msg": "hello, world",
-	})
+	context.HTML(http.StatusOK, "index.html", common.NewSuccessResponse())
+}
+
+func Register(context *gin.Context) {
+	context.HTML(http.StatusOK, "register.html", common.NewSuccessResponse())
 }
